@@ -16,7 +16,7 @@
     <script boot-up>
         //------------------------------------
         //change version if your modules have been modified
-        $vm={};$VmAPI={};$vm.ver=[0.01,0.01];
+        $vm={};$VmAPI={};$vm.ver=[0.05,0.01];
         //------------------------------------
         //app urls
         $vm.public_url_$A='https://biomarkers-ii.rt.org.au';
@@ -24,11 +24,37 @@
         $vm.public_url_$B='http://biomarkers-ii-online-questionnaire.rt.org.au';
         $vm.local_url_$B='http://127.0.0.1:8000/woolcock-imr/biomarkers-ii-online-questionnaire';
         //------------------------------------
-        //where are your frame and app modules
+        //where are your start modules
+        $vm.start_modules=[
+            "$B/app.html",              //app menu, title, footer etc
+            "$A/modules/f/frame.html",  //app frame work
+        ]
+        //------------------------------------
+        //modules used in this app
         $vm.module_list={
-            "app":     {"url":"$B/app.html"},
-            "frame":   {"url":"$A/modules/f/frame.html"},
-        }
+            //you can add modules here directly
+            "home":                             {url:"$A/modules/o/online-questionnaire-login.html"},
+            "online-questionnaire-panel":       {url:"$A/modules/o/online-questionnaire-panel.html"},
+            "participant-data":     	        {url:"$A/modules/p/participant-data.html", Table:"91000570",
+                                                    form_module:"participant-form",
+                                                    panel_child:"panel-child-b-ii",
+                                                    online_questionnaire_setup:"online-questionnaire-setup"
+                                                },
+            "participant-form":     	        {url:"$A/modules/p/participant-form.html", Table:"91000570"},
+            "edc-notes-data":	  		        {url:"$A/modules/e/edc-notes-data.html",Table:"91000571",form_module:"edc-notes-form"},
+            "edc-notes-form":	  		        {url:"$A/modules/e/edc-notes-form.html",Table:"91000571"},
+            /*
+            "online-questionnaire-setup": 	    {url:"$A/modules/o/online-questionnaire-setup.html",Table:"91000570"},
+            "online-questionnaire-panel":       {url:"$A/modules/o/online-questionnaire-panel.html"},
+            "online-questionnaire-login":       {url:"$A/modules/o/online-questionnaire-login.html"},
+            */
+        };
+        //------------------------------------
+        //where are your all other modules
+        $vm.app_modules=[
+            //you can add a js file that will add mmodules to the $vm.module_list
+            "$A/modules/biomarkers-ii.js",
+        ]
         //------------------------------------
         
 
@@ -36,9 +62,9 @@
         
         //------------------------------------
         //Do not need to chang the following code in most cases
-        //The following code will load a framework module and your application module
+        //The following code will load a framework module and your application modules
         //------------------------------------
-        $vm.start_time=new Date().getTime();
+        $VmAPI={};$vm.start_time=new Date().getTime();
         //------------------------------------
         //replace the url
         $vm.replace_url=function(url){
@@ -50,35 +76,56 @@
         }
         //------------------------------------
         if(window.location.hostname=='127.0.0.1' || window.location.hostname=='localhost') $vm.localhost=true;
-        for(p in $vm.module_list) $vm.module_list[p].url=$vm.replace_url($vm.module_list[p].url);
+        for(p in $vm.start_modules) $vm.start_modules[p]=$vm.replace_url($vm.start_modules[p]);
+        for(p in $vm.app_modules) $vm.app_modules[p]=$vm.replace_url($vm.app_modules[p]);
         //------------------------------------
-        $vm._I=0; $vm._boot=function(){
+        $vm._I=0; $vm._N=$vm.start_modules.length+$vm.app_modules.length;
+        $vm._boot=function(){
             $vm._I++;
-            if($vm._I==2){
+            if($vm._I==$vm._N){
+                for(p in $vm.module_list) $vm.module_list[p].url=$vm.replace_url($vm.module_list[p].url);
+                console.log((new Date().getTime()-$vm.start_time)+'ms');
                 $vm._start();
             }
         }
         //------------------------------------------
-        var url1=$vm.module_list["app"].url;
-        var url2=$vm.module_list["frame"].url;
-        var urls=[url1,url2]; $vm._id=2;
+        $vm._id=2;
         //---------------------------------------------
         var apppath=window.location.href.substring(0, window.location.href.lastIndexOf('/')).split('\/?')[0];
-        $(urls).each(function(index,url){
+        $($vm.start_modules).each(function(index,url){
             var ver=localStorage.getItem(apppath+url+"ver");
             var txt=localStorage.getItem(apppath+url+"txt");
             if(ver!=$vm.ver[0] || txt==null || $vm.localhost==true){
                 $.get(url+'?_='+new Date().getTime(),function(new_txt){
                     localStorage.setItem(apppath+url+"txt",new_txt);
                     localStorage.setItem(apppath+url+"ver",$vm.ver[0]);
-                    console.log('loading from url. '+url);
+                    console.log('loading from url. '+url+' '+ver+'/'+$vm.ver[0]);
                     $('#content').append(new_txt.replace(/__ID/g,'_'+(index+1)));
                     $vm._boot();
                 },'text');
             }
             else{
-                console.log('loading from storage. '+url);
+                console.log('loading from storage. '+url+' '+ver+'/'+$vm.ver[0]);
                 $('#content').append(txt.replace(/__ID/g,'_'+(index+1)));
+                $vm._boot();
+            }
+        })
+        //---------------------------------------------
+        $($vm.app_modules).each(function(index,url){
+            var ver=localStorage.getItem(apppath+url+"ver");
+            var txt=localStorage.getItem(apppath+url+"txt");
+            if(ver!=$vm.ver[0] || txt==null || $vm.localhost==true){
+                $.get(url+'?_='+new Date().getTime(),function(new_txt){
+                    localStorage.setItem(apppath+url+"txt",new_txt);
+                    localStorage.setItem(apppath+url+"ver",$vm.ver[0]);
+                    console.log('loading from url. '+url+' '+ver+'/'+$vm.ver[0]);
+                    eval(new_txt);
+                    $vm._boot();
+                },'text');
+            }
+            else{
+                console.log('loading from storage. '+url+' '+ver+'/'+$vm.ver[0]);
+                eval(txt);
                 $vm._boot();
             }
         })

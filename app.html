@@ -33,27 +33,6 @@
         $VmAPI.api_base="https://rt.woolcock.org.au/pro/";
         if(window.location.toString().indexOf('db=dev')!=-1) $VmAPI.api_base="https://cbs.wappsystem.com/dev/";
         //------------------------------------
-        //list all your modules used in your application
-        //Setup each module's Table (you can create your own tables in backoffice)
-        $vm.module_list={
-            "home":                             {url:"$A/modules/o/online-questionnaire-login.html"},
-            "online-questionnaire-panel":       {url:"$A/modules/o/online-questionnaire-panel.html"},
-            
-            /*
-            "participant-data":     	        {url:"$A/modules/p/participant-data.html", Table:"91000124",form_module:"participant-form"},
-            
-		    "v1-ess-form":	 	                {url:"$A/modules/e/epworth-sleepiness-scale-form.html",Table:"91000150",task_name:"Visit 1 - Epworth Sleepiness Scale"},
-		    "v1-sri-form":	 	                {url:"$A/modules/s/sri-form.html",Table:"91000149",task_name:"Visit 1 - Severe Respiratory Insufficiency Questionnaire"},
-            "v1-fosq-form":	 	                {url:"$A/modules/f/fosq-form.html",Table:"91000153",task_name:"Visit 1 - Functional Outcomes of Sleep Questionnaire"},
-            
-		    "3m-ess-form":	 	                {url:"$A/modules/e/epworth-sleepiness-scale-form.html",Table:"91000136",task_name:"3 Month - Epworth Sleepiness Scale"},
-		    "3m-sri-form":	 	                {url:"$A/modules/s/sri-form.html",Table:"91000133",task_name:"3 Month - Severe Respiratory Insufficiency Questionnaire"},
-            "3m-fosq-form":	 	                {url:"$A/modules/f/fosq-form.html",Table:"91000132",task_name:"3 Month - Functional Outcomes of Sleep Questionnaire"},
-            */
-        }
-        //------------------------------------
-        for(p in $vm.module_list) $vm.module_list[p].url=$vm.replace_url($vm.module_list[p].url);
-        //------------------------------------
         //Set your default web page title and footer text
         $vm.default_title="Woolcock";
         $('#text_0').html("Copyright &copy; "+(new Date()).getFullYear()+", Woolcock Institute of Medical Research");
